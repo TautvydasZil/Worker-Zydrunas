@@ -1,0 +1,100 @@
+:root {
+  --text:          #64748b;
+  --text-h:        #0f172a;
+  --bg:            #f8fafc;
+  --surface:       #ffffff;
+  --border:        #e2e8f0;
+  --muted:         #f1f5f9;
+  --code-bg:       #f1f5f9;
+
+  --accent:        #4f46e5;
+  --accent-hover:  #4338ca;
+  --accent-bg:     #eef2ff;
+  --accent-border: #c7d2fe;
+  --accent-ring:   rgba(79, 70, 229, 0.15);
+
+  --danger:        #ef4444;
+  --danger-bg:     #fee2e2;
+  --success:       #22c55e;
+  --success-bg:    #dcfce7;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 24px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.05);
+
+  --radius-sm: 7px;
+  --radius:    10px;
+  --radius-lg: 14px;
+
+  --sans:    'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono:    ui-monospace, Consolas, monospace;
+
+  font: 14px/1.6 var(--sans);
+  letter-spacing: 0.01em;
+  color-scheme: light;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --text:          #94a3b8;
+  --text-h:        #f1f5f9;
+  --bg:            #0f172a;
+  --surface:       #1e293b;
+  --border:        #334155;
+  --muted:         #1e293b;
+  --code-bg:       #1e293b;
+
+  --accent:        #818cf8;
+  --accent-hover:  #6366f1;
+  --accent-bg:     rgba(129, 140, 248, 0.12);
+  --accent-border: rgba(129, 140, 248, 0.3);
+  --accent-ring:   rgba(129, 140, 248, 0.18);
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow:    0 1px 3px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.25);
+  --shadow-lg: 0 10px 24px rgba(0,0,0,0.45), 0 4px 8px rgba(0,0,0,0.3);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body { margin: 0; background: var(--bg); }
+
+h1, h2, h3, h4 {
+  font-family: var(--sans);
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 28px; }
+h2 { font-size: 20px; }
+h3 { font-size: 16px; }
+
+p { margin: 0; }
+
+code {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--code-bg);
+  color: var(--text-h);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+#app {
+  width: 100%;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
