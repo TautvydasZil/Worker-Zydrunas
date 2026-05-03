@@ -5,4 +5,13 @@ const API = axios.create({
   withCredentials: true  // send session cookie with every request
 })
 
+API.interceptors.response.use(
+  res => res,
+  err => {
+    if (err.response?.status === 401) router.push('/login')
+    return Promise.reject(err)
+  }
+)
+
+
 export default API

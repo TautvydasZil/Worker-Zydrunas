@@ -1,23 +1,14 @@
 <template>
-  <DatePicker ref="datePicker" />
+  <DateRangePicker ref="dateRangePicker" />
   <div class="form-card">
     <h2>Pateikti prašymą</h2>
     <form @submit.prevent="submit">
-      <div class="row">
-        <div class="field">
-          <label>Nuo</label>
-          <button type="button" class="date-btn" @click="pickDate('start')">
-            <svg class="date-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg>
-            <span>{{ formatDate(form.start_date) }}</span>
-          </button>
-        </div>
-        <div class="field">
-          <label>Iki</label>
-          <button type="button" class="date-btn" @click="pickDate('end')">
-            <svg class="date-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg>
-            <span>{{ formatDate(form.end_date) }}</span>
-          </button>
-        </div>
+      <div class="field">
+        <label>Laikotarpis</label>
+        <button type="button" class="date-btn" @click="pickRange">
+          <svg class="date-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg>
+          <span>{{ formatDate(form.start_date) }} — {{ formatDate(form.end_date) }}</span>
+        </button>
       </div>
 
       <div class="field" v-if="duration > 0">
@@ -41,7 +32,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import API from '../api'
-import DatePicker from './DatePicker.vue'
+import DateRangePicker from './DateRangePicker.vue'
 
 const props = defineProps({ type: { type: String, default: 'vacation' } })
 const emit = defineEmits(['submitted'])
@@ -50,7 +41,7 @@ const today = new Date().toISOString().split('T')[0]
 const form = ref({ start_date: today, end_date: today, notes: '' })
 const error = ref('')
 const loading = ref(false)
-const datePicker = ref(null)
+const dateRangePicker = ref(null)
 
 const monthNames = ['sausio','vasario','kovo','balandžio','gegužės','birželio','liepos','rugpjūčio','rugsėjo','spalio','lapkričio','gruodžio']
 function formatDate(str) {
@@ -59,17 +50,11 @@ function formatDate(str) {
   return `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`
 }
 
-async function pickDate(which) {
-  const current = which === 'start' ? form.value.start_date : form.value.end_date
-  const label   = which === 'start' ? 'Pradžios data' : 'Pabaigos data'
-  const result  = await datePicker.value.show(current, label)
+async function pickRange() {
+  const result = await dateRangePicker.value.show(form.value.start_date, form.value.end_date, 'Laikotarpis')
   if (result === null) return
-  if (which === 'start') {
-    form.value.start_date = result
-    if (form.value.end_date < result) form.value.end_date = result
-  } else {
-    form.value.end_date = result
-  }
+  form.value.start_date = result.from
+  form.value.end_date   = result.to
 }
 
 const duration = computed(() => {
@@ -87,10 +72,6 @@ const dayWord = computed(() => {
 
 async function submit() {
   error.value = ''
-  if (form.value.end_date < form.value.start_date) {
-    error.value = 'Pabaigos data negali būti ankstesnė už pradžios datą'
-    return
-  }
   loading.value = true
   try {
     await API.post('/leave', {

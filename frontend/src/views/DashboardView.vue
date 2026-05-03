@@ -39,13 +39,13 @@
           <button class="quick-card" @click="activeTab = 'vacation'">
             <span class="qc-icon">🏖️</span>
             <span class="qc-label">Atostogos</span>
-            <span class="qc-sub">Atostogų prašymai</span>
+            <span class="qc-sub">Atostogų prašymas</span>
             <span v-if="pendingVacation" class="qc-badge">{{ pendingVacation }}</span>
           </button>
           <button class="quick-card" @click="activeTab = 'sick'">
             <span class="qc-icon">🤒</span>
             <span class="qc-label">Nedarbingumas</span>
-            <span class="qc-sub">Ligos prašymai</span>
+            <span class="qc-sub">Pranešimas apie ligą</span>
             <span v-if="pendingSick" class="qc-badge">{{ pendingSick }}</span>
           </button>
           <button class="quick-card" @click="activeTab = 'projects'">
@@ -240,7 +240,7 @@ async function onHoursLogged() {
 }
 
 async function refreshLeave() {
-  const res = await API.get('/leave')
+  const res = await API.get('/leave', { params: { user_id: user.value?.id } })
   leaveRequests.value = res.data
 }
 
@@ -435,7 +435,7 @@ onMounted(async () => {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 3px;
   padding: 20px 22px;
   background: var(--surface);

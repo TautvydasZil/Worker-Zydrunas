@@ -1,6 +1,6 @@
 <template>
   <ConfirmDialog ref="confirmDialog" />
-  <DatePicker ref="datePicker" />
+  <DateRangePicker ref="dateRangePicker" />
   <div class="dashboard">
     <header class="topbar">
       <ThemeToggle />
@@ -84,14 +84,9 @@
             {{ selectedUserId ? displayName(selectedUserId) : 'Visi darbuotojai' }}
           </h2>
           <div class="stats-date-row">
-            <button type="button" class="date-btn" @click="pickStatsDate('from')">
+            <button type="button" class="date-btn" @click="pickStatsRange">
               <svg class="date-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg>
-              {{ statsFrom ? formatDate(statsFrom) : 'Nuo…' }}
-            </button>
-            <span class="date-sep">—</span>
-            <button type="button" class="date-btn" @click="pickStatsDate('to')">
-              <svg class="date-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg>
-              {{ statsTo ? formatDate(statsTo) : 'Iki…' }}
+              {{ statsFrom && statsTo ? formatDate(statsFrom) + ' — ' + formatDate(statsTo) : 'Pasirinkti laikotarpį…' }}
             </button>
             <button v-if="statsFrom || statsTo" class="clear-btn" @click="clearStatsFilter">Išvalyti</button>
           </div>
@@ -307,11 +302,11 @@ import { useAuth } from '../composables/useAuth'
 import API from '../api'
 import ProjectsPanel from '../components/ProjectsPanel.vue'
 import ConfirmDialog from '../components/ConfirmDialog.vue'
-import DatePicker from '../components/DatePicker.vue'
+import DateRangePicker from '../components/DateRangePicker.vue'
 import ThemeToggle from '../components/ThemeToggle.vue'
 
-const confirmDialog = ref(null)
-const datePicker = ref(null)
+const confirmDialog    = ref(null)
+const dateRangePicker  = ref(null)
 
 const monthNames = ['sausio','vasario','kovo','balandžio','gegužės','birželio','liepos','rugpjūčio','rugsėjo','spalio','lapkričio','gruodžio']
 function formatDate(str) {
@@ -319,12 +314,11 @@ function formatDate(str) {
   const d = new Date(str + 'T00:00:00')
   return `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`
 }
-async function pickStatsDate(which) {
-  const current = which === 'from' ? (statsFrom.value || new Date().toISOString().split('T')[0]) : (statsTo.value || new Date().toISOString().split('T')[0])
-  const result = await datePicker.value.show(current, which === 'from' ? 'Nuo datos' : 'Iki datos')
+async function pickStatsRange() {
+  const result = await dateRangePicker.value.show(statsFrom.value, statsTo.value, 'Laikotarpis')
   if (result === null) return
-  if (which === 'from') statsFrom.value = result
-  else statsTo.value = result
+  statsFrom.value = result.from
+  statsTo.value   = result.to
   statsLoading.value = true
   await loadStats()
   statsLoading.value = false
@@ -602,7 +596,7 @@ h3 { margin: 0 0 14px; font-size: 15px; }
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 3px;
   padding: 20px 22px;
   background: var(--surface);
