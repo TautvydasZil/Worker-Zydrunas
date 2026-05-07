@@ -1,8 +1,9 @@
 import axios from 'axios'
+import router from './router'
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
-  withCredentials: true  // send session cookie with every request
+  baseURL: import.meta.env.VITE_API_BASE,
+  withCredentials: true
 })
 
 API.interceptors.response.use(
