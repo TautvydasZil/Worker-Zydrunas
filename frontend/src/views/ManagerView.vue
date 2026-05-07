@@ -257,12 +257,8 @@
             </div>
             <p v-if="inviteError" class="error">{{ inviteError }}</p>
           </form>
-          <div v-if="newLink" class="new-link-box">
-            <p class="new-link-label">Pasidalinkite šia nuoroda su {{ newLinkEmail }}:</p>
-            <div class="link-row">
-              <code class="link-text">{{ newLink }}</code>
-              <button class="copy-btn" @click="copyLink">{{ copied ? 'Nukopijuota!' : 'Kopijuoti' }}</button>
-            </div>
+          <div v-if="newLinkEmail" class="new-link-box">
+            <p class="new-link-label">✓ Pakvietimas išsiųstas {{ newLinkEmail }}</p>
             <p class="link-note">Galioja 7 dienas. Vienkartinis naudojimas.</p>
           </div>
         </div>
