@@ -152,7 +152,7 @@ defineExpose({ show })
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  width: 320px;
+  width: min(320px, calc(100vw - 32px));
   box-shadow: var(--shadow-lg);
   overflow: hidden;
 }

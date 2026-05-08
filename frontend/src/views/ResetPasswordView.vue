@@ -90,7 +90,7 @@ async function submit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: clamp(16px, 4vw, 24px);
   background: var(--bg);
 }
 
@@ -99,7 +99,7 @@ async function submit() {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 40px 36px;
+  padding: clamp(24px, 6vw, 40px) clamp(20px, 6vw, 36px);
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;

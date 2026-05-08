@@ -324,11 +324,12 @@ onMounted(async () => {
 .topbar {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 0 28px;
+  gap: 12px;
+  padding: 10px clamp(16px, 4vw, 28px);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  height: 62px;
+  min-height: 52px;
+  height: auto;
   flex-shrink: 0;
   flex-wrap: wrap;
   box-shadow: var(--shadow-sm);
@@ -343,8 +344,12 @@ onMounted(async () => {
   cursor: pointer;
   padding: 0;
   flex: 1;
+  min-width: 0;
   font-family: inherit;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .app-name:hover { color: var(--accent); }
@@ -360,6 +365,11 @@ onMounted(async () => {
   cursor: pointer;
   padding: 0;
   font-family: inherit;
+  display: none;
+}
+
+@media (min-width: 480px) {
+  .username-btn { display: inline; }
 }
 
 .username-btn:hover { color: var(--accent); text-decoration: underline; }
@@ -395,7 +405,7 @@ onMounted(async () => {
 
 /* ── Content ── */
 .content {
-  padding: 28px;
+  padding: clamp(16px, 4vw, 28px);
   width: 100%;
   box-sizing: border-box;
 }
@@ -405,17 +415,17 @@ onMounted(async () => {
 
 .stat-card {
   flex: 1;
-  min-width: 140px;
+  min-width: 120px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22px 24px;
+  padding: clamp(14px, 3vw, 22px) clamp(16px, 4vw, 24px);
   text-align: center;
   box-shadow: var(--shadow-sm);
 }
 
 .stat-value {
-  font-size: 38px;
+  font-size: clamp(26px, 8vw, 38px);
   font-weight: 700;
   color: var(--accent);
   line-height: 1;
@@ -437,7 +447,7 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  padding: 20px 22px;
+  padding: clamp(14px, 4vw, 20px) clamp(12px, 4vw, 22px);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -516,7 +526,7 @@ onMounted(async () => {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22px 24px;
+  padding: clamp(14px, 3vw, 22px) clamp(16px, 4vw, 24px);
   box-shadow: var(--shadow-sm);
 }
 

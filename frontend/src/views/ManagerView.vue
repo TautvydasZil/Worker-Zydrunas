@@ -512,11 +512,12 @@ onMounted(async () => {
 .topbar {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 0 28px;
+  gap: 12px;
+  padding: 10px clamp(16px, 4vw, 28px);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  height: 62px;
+  min-height: 52px;
+  height: auto;
   flex-shrink: 0;
   flex-wrap: wrap;
   box-shadow: var(--shadow-sm);
@@ -531,14 +532,22 @@ onMounted(async () => {
   cursor: pointer;
   padding: 0;
   flex: 1;
+  min-width: 0;
   font-family: inherit;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .app-name:hover { color: var(--accent); }
 
 .user-area { display: flex; align-items: center; gap: 12px; margin-left: auto; }
-.username { font-size: 13px; color: var(--text); font-weight: 500; }
+.username { font-size: 13px; color: var(--text); font-weight: 500; display: none; }
+
+@media (min-width: 480px) {
+  .username { display: inline; }
+}
 
 .back-link {
   font-size: 13px;
@@ -571,7 +580,7 @@ onMounted(async () => {
 
 /* ── Content ── */
 .content {
-  padding: 28px;
+  padding: clamp(16px, 4vw, 28px);
   width: 100%;
   box-sizing: border-box;
 }
@@ -720,16 +729,16 @@ label { font-size: 13px; font-weight: 500; color: var(--text-h); }
 
 .card {
   flex: 1;
-  min-width: 120px;
+  min-width: 100px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px 22px;
+  padding: clamp(12px, 2.5vw, 20px) clamp(14px, 3vw, 22px);
   text-align: center;
   box-shadow: var(--shadow-sm);
 }
 
-.card-value { font-size: 34px; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
+.card-value { font-size: clamp(24px, 7vw, 34px); font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
 .card-label { font-size: 11px; color: var(--text); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
 
 .section { margin-bottom: 28px; }
@@ -766,9 +775,11 @@ tbody tr:hover td { background: var(--muted); }
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: var(--shadow-sm);
 }
+
+table { min-width: 480px; }
 
 .empty { color: var(--text); font-size: 13px; padding: 16px 0; margin: 0; }
 
@@ -793,7 +804,7 @@ tbody tr:hover td { background: var(--muted); }
 .req-dates { font-size: 13px; color: var(--text-h); }
 .req-days { font-size: 12px; color: var(--text); font-weight: 500; }
 .req-notes { font-size: 12px; color: var(--text); font-style: italic; }
-.req-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.req-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
 .type-badge {
   font-size: 11px;
@@ -853,14 +864,14 @@ tbody tr:hover td { background: var(--muted); }
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22px 24px;
+  padding: clamp(14px, 3vw, 22px) clamp(16px, 4vw, 24px);
   margin-bottom: 28px;
   box-shadow: var(--shadow-sm);
 }
 
 .invite-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
-.field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 160px; }
-.field-role { flex: 0 0 160px; }
+.field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; }
+.field-role { flex: 1; min-width: 130px; }
 
 input {
   padding: 9px 12px;
@@ -889,13 +900,18 @@ button[type="submit"] {
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  align-self: flex-end;
+  align-self: stretch;
+  width: 100%;
   font-family: inherit;
   transition: background 0.15s;
 }
 
 button[type="submit"]:hover { background: var(--accent-hover); }
 button:disabled { opacity: 0.55; cursor: default; }
+
+@media (min-width: 640px) {
+  button[type="submit"] { width: auto; align-self: flex-end; }
+}
 
 .new-link-box {
   margin-top: 16px;

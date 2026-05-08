@@ -326,7 +326,7 @@ button:disabled { opacity: 0.55; cursor: default; }
 
 .project-address { font-size: 12px; color: var(--text); }
 
-.project-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.project-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .edit-btn {
   padding: 5px 13px;

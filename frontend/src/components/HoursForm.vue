@@ -267,7 +267,7 @@ async function submit() {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: clamp(16px, 4vw, 24px);
   margin-bottom: 24px;
   box-shadow: var(--shadow-sm);
 }
@@ -604,7 +604,10 @@ button[type="submit"] {
 button[type="submit"]:hover { background: var(--accent-hover); }
 button:disabled { opacity: 0.55; cursor: default; }
 
-.form-actions { display: flex; gap: 10px; align-items: center; }
+.form-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+.form-actions button[type="submit"],
+.form-actions .cancel-btn { flex: 1; }
 
 .cancel-btn {
   padding: 10px 18px;
