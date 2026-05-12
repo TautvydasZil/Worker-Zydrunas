@@ -89,6 +89,10 @@
               {{ statsFrom && statsTo ? formatDate(statsFrom) + ' — ' + formatDate(statsTo) : 'Pasirinkti laikotarpį…' }}
             </button>
             <button v-if="statsFrom || statsTo" class="clear-btn" @click="clearStatsFilter">Išvalyti</button>
+            <button v-if="hours.length || approvedLeave.length" class="pdf-btn" @click="downloadPdf">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px;flex-shrink:0"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+              PDF
+            </button>
           </div>
         </div>
 
@@ -300,6 +304,8 @@ import ProjectsPanel from '../components/ProjectsPanel.vue'
 import ConfirmDialog from '../components/ConfirmDialog.vue'
 import DateRangePicker from '../components/DateRangePicker.vue'
 import ThemeToggle from '../components/ThemeToggle.vue'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 const confirmDialog    = ref(null)
 const dateRangePicker  = ref(null)
@@ -391,6 +397,116 @@ async function clearStatsFilter() {
   statsLoading.value = true
   await loadStats()
   statsLoading.value = false
+}
+
+function lt(str) {
+  return String(str)
+    .replace(/ą/g,'a').replace(/č/g,'c').replace(/ę/g,'e').replace(/ė/g,'e')
+    .replace(/į/g,'i').replace(/š/g,'s').replace(/ų/g,'u').replace(/ū/g,'u').replace(/ž/g,'z')
+    .replace(/Ą/g,'A').replace(/Č/g,'C').replace(/Ę/g,'E').replace(/Ė/g,'E')
+    .replace(/Į/g,'I').replace(/Š/g,'S').replace(/Ų/g,'U').replace(/Ū/g,'U').replace(/Ž/g,'Z')
+}
+
+function downloadPdf() {
+  const doc = new jsPDF()
+  const workerName = lt(selectedUserId.value ? displayName(selectedUserId.value) : 'Visi darbuotojai')
+  const period = statsFrom.value && statsTo.value
+    ? `${statsFrom.value} - ${statsTo.value}`
+    : 'Visas laikotarpis'
+
+  doc.setFontSize(16)
+  doc.setFont('helvetica', 'bold')
+  doc.text('Darbo valandu ataskaita', 14, 18)
+
+  doc.setFontSize(11)
+  doc.setFont('helvetica', 'normal')
+  doc.text(`Darbuotojas: ${workerName}`, 14, 28)
+  doc.text(`Laikotarpis: ${period}`, 14, 35)
+
+  autoTable(doc, {
+    startY: 42,
+    head: [['Viso valandu', 'Atostogu dienos', 'Nedarbingumo dienos']],
+    body: [[totalHours.value.toFixed(1), approvedVacationDays.value, approvedSickDays.value]],
+    styles: { fontSize: 10, halign: 'center' },
+    headStyles: { fillColor: [79, 70, 229], halign: 'center' },
+    theme: 'grid',
+  })
+
+  let y = doc.lastAutoTable.finalY + 10
+
+  if (hours.value.length) {
+    const workerTotals = {}
+    hours.value.forEach(e => {
+      const name = lt(displayName(e.user_id))
+      workerTotals[name] = (workerTotals[name] || 0) + e.hours
+    })
+    const summaryRows = Object.entries(workerTotals).map(([name, h]) => [name, h.toFixed(1)])
+
+    if (summaryRows.length > 1) {
+      doc.setFontSize(12)
+      doc.setFont('helvetica', 'bold')
+      doc.text('Valandu suvestine', 14, y)
+      y += 4
+
+      autoTable(doc, {
+        startY: y,
+        head: [['Darbuotojas', 'Viso valandu']],
+        body: summaryRows,
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [79, 70, 229] },
+        alternateRowStyles: { fillColor: [245, 247, 255] },
+      })
+      y = doc.lastAutoTable.finalY + 10
+    }
+
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Darbo valandos', 14, y)
+    y += 4
+
+    autoTable(doc, {
+      startY: y,
+      head: [['Darbuotojas', 'Data', 'Pradzia', 'Pabaiga', 'Valandos', 'Pastabos']],
+      body: hours.value.map(e => [
+        lt(displayName(e.user_id)),
+        e.date,
+        e.start_time ?? '-',
+        e.end_time ?? '-',
+        e.hours,
+        lt(e.notes ?? '')
+      ]),
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [79, 70, 229] },
+      alternateRowStyles: { fillColor: [245, 247, 255] },
+    })
+    y = doc.lastAutoTable.finalY + 10
+  }
+
+  if (approvedLeave.value.length) {
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Patvirtinti prasymai', 14, y)
+    y += 4
+
+    autoTable(doc, {
+      startY: y,
+      head: [['Darbuotojas', 'Tipas', 'Nuo', 'Iki', 'Dienu', 'Pastabos']],
+      body: approvedLeave.value.map(r => [
+        lt(displayName(r.user_id)),
+        r.type === 'vacation' ? 'Atostogos' : 'Nedarbingumas',
+        r.start_date,
+        r.end_date,
+        r.days,
+        lt(r.notes ?? '')
+      ]),
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [79, 70, 229] },
+      alternateRowStyles: { fillColor: [245, 247, 255] },
+    })
+  }
+
+  const safeName = workerName.replace(/\s+/g, '_')
+  doc.save(`ataskaita_${safeName}_${statsFrom.value || 'visi'}.pdf`)
 }
 
 // ── Prašymai ──
@@ -723,6 +839,25 @@ label { font-size: 13px; font-weight: 500; color: var(--text-h); }
 }
 
 .clear-btn:hover { border-color: var(--text-h); color: var(--text-h); }
+
+.pdf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.pdf-btn:hover { background: var(--accent-hover); }
 
 /* ── Summary cards ── */
 .summary-cards { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
